@@ -2,6 +2,28 @@
 
 OpenClaw plugin that filters incidental group chat mentions using a cheap LLM gate. Prevents the bot from replying when its name is merely mentioned in passing ("Žofka found something earlier") rather than directly addressed ("Žofka, what do you think?").
 
+## Quick start
+
+```bash
+# 1. Install the plugin
+git clone https://github.com/elkimek/mention-gate.git
+cd mention-gate && npm install && npm run build
+openclaw plugins install /path/to/mention-gate
+
+# 2. Set your API key and bot name (dashboard or CLI)
+openclaw config set plugins.entries.mention-gate.config.apiKey "sk-ant-..."
+openclaw config set plugins.entries.mention-gate.config.botName "YourBot"
+
+# 3. Add a mention pattern so your bot responds to its name in group chats
+# Edit ~/.openclaw/openclaw.json and add:
+#   "messages": { "groupChat": { "mentionPatterns": ["YourBot"] } }
+
+# 4. Restart the gateway
+systemctl --user restart openclaw-gateway
+```
+
+That's it. Your bot will now stay quiet when mentioned in passing and only reply when directly addressed.
+
 ## How it works
 
 When the bot is mentioned in a group chat, OpenClaw processes the message and generates a reply. Before that reply is sent, mention-gate intercepts it:
@@ -14,26 +36,9 @@ DMs always pass through. The gate only applies to group chats.
 
 > **Note:** The main model (e.g., Sonnet) still processes the message — you'll see a typing indicator appear and then drop for incidental mentions. There's currently no OpenClaw hook to block inbound processing before the model runs. This plugin saves reply noise, not inference tokens.
 
-## Install
-
-```bash
-openclaw plugins install mention-gate
-```
-
-Or from a local path:
-
-```bash
-openclaw plugins install /path/to/mention-gate
-```
-
 ## Configuration
 
-All fields are configurable via the OpenClaw dashboard (**Settings > Config > Automation > Plugins > mention-gate**) or CLI:
-
-```bash
-openclaw config set plugins.entries.mention-gate.config.apiKey "sk-ant-..."
-openclaw config set plugins.entries.mention-gate.config.botName "Žofka"
-```
+All fields are configurable via the OpenClaw dashboard (**Settings > Config > Automation > Plugins > mention-gate**) or CLI.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -53,28 +58,28 @@ openclaw config set plugins.entries.mention-gate.config.botName "Žofka"
 
 The `openai` provider works with any OpenAI-compatible endpoint — OpenRouter, Together, local vLLM, etc. Just set `baseUrl` to your endpoint.
 
-## Requirements
+### Setting up mention patterns
 
-- OpenClaw 2026.3.13+
-- An API key for Anthropic or any OpenAI-compatible provider
-
-The plugin also requires `mentionPatterns` to be configured in your OpenClaw config so the bot's name triggers processing in group messages:
+The plugin requires `mentionPatterns` in your OpenClaw config so the bot's name triggers processing in group messages. Edit `~/.openclaw/openclaw.json`:
 
 ```json
 {
   "messages": {
     "groupChat": {
-      "mentionPatterns": ["[Žž]ofka"]
+      "mentionPatterns": ["YourBot"]
     }
   }
 }
 ```
 
-Replace `[Žž]ofka` with your bot's name. Avoid `\b` word boundaries if the name contains non-ASCII characters — JavaScript regex treats `\b` as ASCII-only.
+Tips:
+- Use a simple substring pattern — e.g., `"YourBot"` matches anywhere in the message
+- For non-ASCII names, avoid `\b` word boundaries — JavaScript regex treats them as ASCII-only
+- For case variants, use a character class — e.g., `"[Yy]ourBot"`
 
-## Recommended companion settings
+### Recommended: reply threading
 
-**Reply threading** — lets people continue conversations by replying to the bot's messages without mentioning its name:
+Let people continue conversations by replying to the bot's messages without mentioning its name every time:
 
 ```json
 {
@@ -89,6 +94,11 @@ Replace `[Žž]ofka` with your bot's name. Avoid `\b` word boundaries if the nam
 ## Channel support
 
 The plugin is channel-agnostic — it hooks into `message_sending` which fires for all outbound replies. Group detection covers Matrix, Discord, SimpleX, and any channel that sets `metadata.isGroup`.
+
+## Requirements
+
+- OpenClaw 2026.3.13+
+- An API key for Anthropic or any OpenAI-compatible provider
 
 ## Development
 
