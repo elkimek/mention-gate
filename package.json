@@ -1,0 +1,16 @@
+{
+  "name": "mention-gate",
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Filters incidental mentions using a cheap LLM gate before they reach the main model",
+  "openclaw": {
+    "extensions": ["./dist/index.js"]
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

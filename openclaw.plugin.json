@@ -1,0 +1,78 @@
+{
+  "id": "mention-gate",
+  "name": "Mention Gate",
+  "version": "0.2.0",
+  "description": "Filters incidental group mentions using a cheap LLM gate. Prevents the bot from replying when its name is merely mentioned in passing rather than directly addressed.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "provider": {
+        "type": "string",
+        "description": "LLM provider for the intent gate",
+        "enum": ["anthropic", "openai"],
+        "default": "anthropic"
+      },
+      "apiKey": {
+        "type": "string",
+        "description": "API key for the gate model provider"
+      },
+      "baseUrl": {
+        "type": "string",
+        "description": "Custom API base URL (optional — defaults per provider)"
+      },
+      "model": {
+        "type": "string",
+        "description": "Model for intent classification"
+      },
+      "botName": {
+        "type": "string",
+        "description": "The bot display name used in the gate prompt"
+      },
+      "timeoutMs": {
+        "type": "number",
+        "description": "Gate request timeout in milliseconds",
+        "default": 5000
+      }
+    }
+  },
+  "uiHints": {
+    "provider": {
+      "label": "Provider",
+      "help": "Select 'anthropic' for direct Anthropic API, or 'openai' for OpenRouter and other OpenAI-compatible endpoints.",
+      "order": 10
+    },
+    "apiKey": {
+      "label": "API Key",
+      "sensitive": true,
+      "placeholder": "sk-ant-api03-... or sk-or-v1-...",
+      "help": "API key for the selected provider. Used only for the cheap intent-classification call.",
+      "order": 20
+    },
+    "baseUrl": {
+      "label": "Base URL",
+      "placeholder": "https://openrouter.ai/api",
+      "help": "Override the default API endpoint. Anthropic defaults to https://api.anthropic.com, OpenAI-compatible defaults to https://openrouter.ai/api.",
+      "advanced": true,
+      "order": 30
+    },
+    "model": {
+      "label": "Gate Model",
+      "placeholder": "claude-haiku-4-5-20251001",
+      "help": "A small, fast model works best. Defaults to claude-haiku-4-5-20251001 (Anthropic) or anthropic/claude-haiku-4-5-20251001 (OpenRouter).",
+      "order": 40
+    },
+    "botName": {
+      "label": "Bot Name",
+      "placeholder": "Žofka",
+      "help": "Your bot's display name. The gate prompt uses this to distinguish 'directed at me' from 'mentioned in passing'.",
+      "order": 50
+    },
+    "timeoutMs": {
+      "label": "Timeout (ms)",
+      "help": "How long to wait for the gate model before falling back to pass-through. Default: 5000ms.",
+      "advanced": true,
+      "order": 60
+    }
+  }
+}
