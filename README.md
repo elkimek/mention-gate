@@ -2,6 +2,16 @@
 
 OpenClaw plugin that filters incidental group chat mentions using a cheap LLM gate. Prevents the bot from replying when its name is merely mentioned in passing ("Žofka found something earlier") rather than directly addressed ("Žofka, what do you think?").
 
+## Why
+
+When an OpenClaw bot joins a group chat, it responds every time someone mentions its name — even when people are just talking *about* it, not *to* it. In a busy room this gets noisy fast, and every response burns model tokens.
+
+mention-gate adds a cheap intent-classification layer (Haiku, ~50 tokens per check) that intercepts outgoing replies and asks: "Was the original message actually directed at the bot?" If not, the reply is silently cancelled.
+
+**Real-world example:** We run an OpenClaw bot called Žofka in a shared Matrix room with humans and another AI agent. Without the gate, messages like "I think Žofka mentioned that yesterday" would trigger a full Sonnet response. With the gate, she stays quiet — but still responds instantly when someone says "Žofka, what do you think about this?"
+
+The gate works with any channel OpenClaw supports (Matrix, SimpleX, Discord, etc.) and any OpenAI-compatible or Anthropic model for classification.
+
 ## Quick start
 
 ```bash
