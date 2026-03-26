@@ -1,16 +1,29 @@
 # mention-gate
 
-OpenClaw plugin that filters incidental group chat mentions using a cheap LLM gate. Prevents the bot from replying when its name is merely mentioned in passing ("Žofka found something earlier") rather than directly addressed ("Žofka, what do you think?").
+Smart mention filter for AI bots in group chats. Uses a cheap LLM (like Haiku) to tell the difference between someone talking *to* the bot and someone just talking *about* it — and cancels the reply when it's not needed.
 
-## Why
+Plugin for [OpenClaw](https://openclaw.com), the open-source AI agent gateway.
 
-When an OpenClaw bot joins a group chat, it responds every time someone mentions its name — even when people are just talking *about* it, not *to* it. In a busy room this gets noisy fast, and every response burns model tokens.
+## The problem
 
-mention-gate adds a cheap intent-classification layer (Haiku, ~50 tokens per check) that intercepts outgoing replies and asks: "Was the original message actually directed at the bot?" If not, the reply is silently cancelled.
+When an AI bot joins a group chat (Matrix, Discord, SimpleX, etc.), it typically responds every time someone mentions its name. But in a multi-agent or team room, people often mention the bot in passing:
 
-**Real-world example:** We run an OpenClaw bot called Žofka in a shared Matrix room with humans and another AI agent. Without the gate, messages like "I think Žofka mentioned that yesterday" would trigger a full Sonnet response. With the gate, she stays quiet — but still responds instantly when someone says "Žofka, what do you think about this?"
+- "I think **Žofka** mentioned that yesterday" — talking about the bot, not to it
+- "**Žofka**, what do you think?" — actually addressing the bot
 
-The gate works with any channel OpenClaw supports (Matrix, SimpleX, Discord, etc.) and any OpenAI-compatible or Anthropic model for classification.
+Without filtering, the bot replies to both. That means unwanted responses in the chat and wasted model tokens (Sonnet, GPT-4, etc.) on messages that didn't need an answer.
+
+## How mention-gate solves it
+
+The plugin intercepts outgoing replies and runs a cheap intent check (~50 tokens via Haiku or any small model):
+
+> "Was the original message directed at the bot, or just mentioning it in passing?"
+
+If incidental → reply is silently cancelled. If directed → reply goes through normally.
+
+**Real-world example:** We run two AI agents in a shared encrypted Matrix room — [Claude Code](https://claude.ai/code) (a coding agent) and Žofka (an [OpenClaw](https://openclaw.com) bot on Sonnet). Claude builds plugins, Žofka tests them, and they discuss issues in the chat alongside the human operator. Without the gate, Žofka would jump in every time anyone said her name. With the gate, she only responds when actually asked — keeping the room clean for the multi-agent workflow.
+
+Works with any channel OpenClaw supports (Matrix, SimpleX, Discord, etc.) and any Anthropic or OpenAI-compatible model for classification.
 
 ## Quick start
 
