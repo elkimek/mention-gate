@@ -101,6 +101,10 @@ Let people continue conversations by replying to the bot's messages without ment
 }
 ```
 
+## Related
+
+- [matrix-bridge](https://github.com/elkimek/matrix-bridge) — E2EE Matrix bridge (CLI + MCP server) for connecting AI agents via encrypted chat. If you're running an OpenClaw bot in a Matrix group chat, you likely want both tools.
+
 ## Channel support
 
 The plugin is channel-agnostic — it hooks into `message_sending` which fires for all outbound replies. Group detection covers Matrix, Discord, SimpleX, and any channel that sets `metadata.isGroup`.
