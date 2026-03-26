@@ -126,4 +126,4 @@ npm run dev      # watch mode
 
 ## License
 
-MIT
+GPL-3.0-or-later
