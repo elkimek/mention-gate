@@ -135,6 +135,12 @@ npm run build    # compile TypeScript
 npm run dev      # watch mode
 ```
 
+## Security notes
+
+**Prompt injection is a feature (and a risk).** The gate passes user messages directly into an LLM prompt for classification. Any user in the chat can influence the gate's decision through their message content. This is partially by design — the gate needs to understand natural language intent. It is a noise filter, not a security boundary. If you need hard access control, use OpenClaw's allowlist/blocklist features.
+
+**Keep API keys separate.** The gate uses its own API key for cheap classification calls (Haiku). This should be a different key from the bot's main LLM provider. If you use the same key for both, a compromise of one exposes the other. See [SECURITY.md](SECURITY.md) for details.
+
 ## Technical notes
 
 - Uses `api.on()` (typed plugin hooks), not the legacy `api.registerHook()` — the latter writes to a separate registry that the hook dispatcher never reads.

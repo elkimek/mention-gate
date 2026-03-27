@@ -48,13 +48,23 @@ function pruneStash() {
 }
 
 function buildSystemPrompt(botName: string): string {
-  return (
-    `You are a filter for a chat bot named ${botName}. ` +
-    `Decide whether the following message is DIRECTED at ${botName} ` +
-    '(asking it to respond, answer, act, or do something) ' +
-    `or merely MENTIONS ${botName} in passing (talking about it to someone else). ` +
-    'Reply with exactly YES if directed, or NO if not.'
-  );
+  return [
+    `You are a filter for a chat bot named ${botName} in a group chat.`,
+    `Decide whether the message expects ${botName} to respond.`,
+    '',
+    'Reply YES if:',
+    `- The sender addresses ${botName} by name or nickname`,
+    `- The sender asks ${botName} a question or makes a request`,
+    `- The sender is clearly talking TO ${botName} even without using the name (e.g. "what do you think?", "you there?", "hey answer me")`,
+    `- The message is a direct follow-up to something ${botName} just said`,
+    '',
+    'Reply NO if:',
+    `- The sender is talking ABOUT ${botName} to someone else (e.g. "I asked ${botName} earlier", "${botName} is so funny")`,
+    `- ${botName}'s name appears incidentally in a message meant for other people`,
+    `- The sender is having a separate conversation that does not involve ${botName}`,
+    '',
+    'Reply with exactly YES or NO.',
+  ].join('\n');
 }
 
 const PROVIDER_DEFAULTS: Record<string, { baseUrl: string; model: string }> = {
